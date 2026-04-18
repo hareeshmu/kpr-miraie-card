@@ -195,6 +195,11 @@ keep working unchanged (same entity ID, just renamed in the UI).
 
 ## Changelog
 
+### 1.3.2
+- Add a ⋮ button to the card header that opens Home Assistant's built-in
+  more-info dialog for the climate entity — one tap from there to Device info,
+  Related, or the full entity details.
+
 ### 1.3.1
 - Show current room temperature as the large center reading when the AC is
   powered off (was `--°C`). Mode label still reads "Off" and the cyan line

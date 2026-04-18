@@ -1,4 +1,4 @@
-const KPR_CARD_VERSION = "1.3.1";
+const KPR_CARD_VERSION = "1.3.2";
 console.info(
   `%c KPR-MIRAIE-CARD %c v${KPR_CARD_VERSION} `,
   "background:#00bfff;color:#000;font-weight:700;padding:2px 4px;border-radius:3px 0 0 3px;",
@@ -240,6 +240,14 @@ class KprMiraieCard extends LitElement {
 
   _setSelect(entityId, option) {
     this._callService("select", "select_option", { entity_id: entityId, option });
+  }
+
+  // Open HA's built-in more-info dialog for the climate entity. From there the
+  // user can jump to Device info / Related / Details via the dialog's own header.
+  _openMoreInfo() {
+    const evt = new Event("hass-more-info", { bubbles: true, composed: true });
+    evt.detail = { entityId: this.config.entity };
+    this.dispatchEvent(evt);
   }
 
   _cycleFan(dir, fanMode) {
@@ -624,6 +632,9 @@ class KprMiraieCard extends LitElement {
               <span class="last-seen">${this._relativeTime(stateObj.last_changed || stateObj.last_updated)}</span>
               <ha-icon class="wifi" icon="${this._rssiIcon((this._getState(this.config.rssi_entity) || {}).state ?? stateObj.attributes.rssi)}"
                 title="RSSI: ${(this._getState(this.config.rssi_entity) || {}).state ?? "n/a"} dBm"></ha-icon>
+              <ha-icon class="more-info" icon="mdi:dots-vertical"
+                title="More info"
+                @click=${(e) => { e.stopPropagation(); this._openMoreInfo(); }}></ha-icon>
             </div>
           </div>
         ` : ""}
@@ -933,6 +944,18 @@ class KprMiraieCard extends LitElement {
       }
       .card-meta .last-seen { white-space: nowrap; }
       .card-meta .wifi { --mdc-icon-size: 16px; color: var(--text-secondary); }
+      .card-meta .more-info {
+        --mdc-icon-size: 18px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 2px;
+        border-radius: 4px;
+        transition: color 0.15s ease, background 0.15s ease;
+      }
+      .card-meta .more-info:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.08);
+      }
 
       /* Main 3-column area — wider gap so side controls breathe away from the dial */
       .main-area {
