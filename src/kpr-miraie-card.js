@@ -1,4 +1,4 @@
-const KPR_CARD_VERSION = "1.3.2";
+const KPR_CARD_VERSION = "1.3.3";
 console.info(
   `%c KPR-MIRAIE-CARD %c v${KPR_CARD_VERSION} `,
   "background:#00bfff;color:#000;font-weight:700;padding:2px 4px;border-radius:3px 0 0 3px;",
@@ -23,6 +23,7 @@ class KprMiraieCard extends LitElement {
       _expandFeatures: { type: Boolean },
       _expandEnergy: { type: Boolean },
       _showMoreModes: { type: Boolean },
+      _showMoreMenu: { type: Boolean },
       _dragTargetTemp: { type: Number },
     };
   }
@@ -34,6 +35,7 @@ class KprMiraieCard extends LitElement {
     this._expandConverti = false;
     this._expandFeatures = false;
     this._expandEnergy = false;
+    this._showMoreMenu = false;
     this._dragTargetTemp = null;
   }
 
@@ -242,12 +244,39 @@ class KprMiraieCard extends LitElement {
     this._callService("select", "select_option", { entity_id: entityId, option });
   }
 
-  // Open HA's built-in more-info dialog for the climate entity. From there the
-  // user can jump to Device info / Related / Details via the dialog's own header.
-  _openMoreInfo() {
+  // Fire HA's built-in more-info dialog for the climate entity.
+  _moreInfoDetails() {
     const evt = new Event("hass-more-info", { bubbles: true, composed: true });
     evt.detail = { entityId: this.config.entity };
     this.dispatchEvent(evt);
+    this._showMoreMenu = false;
+  }
+
+  // Navigate to the device page for this AC (/config/devices/device/<device_id>).
+  // device_id comes from HA's entity registry (hass.entities).
+  _openDeviceInfo() {
+    const entityReg = this.hass && this.hass.entities && this.hass.entities[this.config.entity];
+    const deviceId = entityReg && entityReg.device_id;
+    if (deviceId) {
+      history.pushState(null, "", `/config/devices/device/${deviceId}`);
+      window.dispatchEvent(new Event("location-changed"));
+    } else {
+      // Fallback — fire more-info which has a link to the device page.
+      this._moreInfoDetails();
+    }
+    this._showMoreMenu = false;
+  }
+
+  // Show related items via HA's standard "related" dialog.
+  _openRelated() {
+    const evt = new Event("hass-action", { bubbles: true, composed: true });
+    evt.detail = {
+      config: { tap_action: { action: "more-info" } },
+      action: "tap",
+      entity: this.config.entity,
+    };
+    // Fallback to more-info — HA's dialog has a Related tab.
+    this._moreInfoDetails();
   }
 
   _cycleFan(dir, fanMode) {
@@ -632,9 +661,25 @@ class KprMiraieCard extends LitElement {
               <span class="last-seen">${this._relativeTime(stateObj.last_changed || stateObj.last_updated)}</span>
               <ha-icon class="wifi" icon="${this._rssiIcon((this._getState(this.config.rssi_entity) || {}).state ?? stateObj.attributes.rssi)}"
                 title="RSSI: ${(this._getState(this.config.rssi_entity) || {}).state ?? "n/a"} dBm"></ha-icon>
-              <ha-icon class="more-info" icon="mdi:dots-vertical"
-                title="More info"
-                @click=${(e) => { e.stopPropagation(); this._openMoreInfo(); }}></ha-icon>
+              <div class="more-wrap">
+                <ha-icon class="more-info" icon="mdi:dots-vertical"
+                  title="More"
+                  @click=${(e) => { e.stopPropagation(); this._showMoreMenu = !this._showMoreMenu; }}></ha-icon>
+                ${this._showMoreMenu ? html`
+                  <div class="more-backdrop" @click=${() => { this._showMoreMenu = false; }}></div>
+                  <div class="more-menu" @click=${(e) => e.stopPropagation()}>
+                    <button class="more-item" @click=${() => this._openDeviceInfo()}>
+                      <ha-icon icon="mdi:devices"></ha-icon><span>Device info</span>
+                    </button>
+                    <button class="more-item" @click=${() => this._openRelated()}>
+                      <ha-icon icon="mdi:information-outline"></ha-icon><span>Related</span>
+                    </button>
+                    <button class="more-item" @click=${() => this._moreInfoDetails()}>
+                      <ha-icon icon="mdi:format-list-bulleted"></ha-icon><span>Details</span>
+                    </button>
+                  </div>
+                ` : ""}
+              </div>
             </div>
           </div>
         ` : ""}
@@ -944,6 +989,7 @@ class KprMiraieCard extends LitElement {
       }
       .card-meta .last-seen { white-space: nowrap; }
       .card-meta .wifi { --mdc-icon-size: 16px; color: var(--text-secondary); }
+      .card-meta .more-wrap { position: relative; display: inline-flex; }
       .card-meta .more-info {
         --mdc-icon-size: 18px;
         color: var(--text-secondary);
@@ -956,6 +1002,41 @@ class KprMiraieCard extends LitElement {
         color: var(--text-primary);
         background: rgba(255, 255, 255, 0.08);
       }
+      .more-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+      }
+      .more-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        z-index: 21;
+        min-width: 160px;
+        background: #1a1f2e;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        padding: 4px;
+        animation: fade-in 140ms ease-out;
+      }
+      .more-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.15s ease;
+      }
+      .more-item:hover { background: rgba(255, 255, 255, 0.08); }
+      .more-item ha-icon { --mdc-icon-size: 18px; color: var(--text-secondary); }
 
       /* Main 3-column area — wider gap so side controls breathe away from the dial */
       .main-area {

@@ -195,6 +195,13 @@ keep working unchanged (same entity ID, just renamed in the UI).
 
 ## Changelog
 
+### 1.3.3
+- ⋮ header button now opens an **inline dropdown** directly on the card instead
+  of jumping straight to HA's more-info dialog. Three actions:
+  - **Device info** — navigates in-app to `/config/devices/device/<id>`
+  - **Related** — opens the more-info dialog (has a Related tab)
+  - **Details** — opens the more-info dialog
+
 ### 1.3.2
 - Add a ⋮ button to the card header that opens Home Assistant's built-in
   more-info dialog for the climate entity — one tap from there to Device info,
