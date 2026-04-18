@@ -1,4 +1,4 @@
-const KPR_CARD_VERSION = "1.3.3";
+const KPR_CARD_VERSION = "1.3.4";
 console.info(
   `%c KPR-MIRAIE-CARD %c v${KPR_CARD_VERSION} `,
   "background:#00bfff;color:#000;font-weight:700;padding:2px 4px;border-radius:3px 0 0 3px;",
@@ -176,10 +176,11 @@ class KprMiraieCard extends LitElement {
   setConfig(config) {
     if (!config.entity) throw new Error("Please define a climate entity");
 
-    // Auto-derive companion entities from the climate entity's slug.
-    // Example: climate.kpr_05f448d0cfa6 → base slug "kpr_05f448d0cfa6"
-    // → switch.kpr_05f448d0cfa6_acem, select.kpr_05f448d0cfa6_v_swing, etc.
-    // User-supplied values always override.
+    // Stage 1 (setConfig) — slug-based derivation. Works when the climate
+    // entity_id hasn't been renamed.
+    // Stage 2 (_resolveEntitiesByDevice, called on each render) — re-resolve
+    // any missing companions via the HA entity registry using the climate's
+    // device_id. Handles renamed climate entities.
     const slugMatch = config.entity.match(/^climate\.(.+)$/);
     const slug = slugMatch ? slugMatch[1] : null;
     const derive = (domain, suffix) => slug ? `${domain}.${slug}_${suffix}` : "";
@@ -205,6 +206,57 @@ class KprMiraieCard extends LitElement {
       show_swing: config.show_swing !== false,
       show_extras: config.show_extras !== false,
     };
+    // Track which keys were user-supplied — only auto-resolved keys get
+    // rewritten by _resolveEntitiesByDevice. User overrides are sacred.
+    this._userSet = new Set(Object.keys(config));
+  }
+
+  // Re-resolve auto-derived companions by looking up entities in the HA
+  // registry that share the climate's device_id. Idempotent; cheap.
+  // Fixes breakage when users rename the climate entity (auto-derive from
+  // the renamed slug no longer finds the right switches/sensors/selects).
+  _resolveEntitiesByDevice() {
+    if (!this.hass || !this.hass.entities) return;
+    const climateReg = this.hass.entities[this.config.entity];
+    const deviceId = climateReg && climateReg.device_id;
+    if (!deviceId) return;
+
+    // key → { domain, suffix regex to match entities for this device }
+    const matchMap = {
+      eco_entity:            { domain: "switch", re: /_acem$/ },
+      clean_entity:          { domain: "switch", re: /_acec$/ },
+      powerful_entity:       { domain: "switch", re: /_acpm$/ },
+      nanoe_entity:          { domain: "switch", re: /_acng$/ },
+      display_entity:        { domain: "switch", re: /_acdc$/ },
+      buzzer_entity:         { domain: "switch", re: /_bzr$/ },
+      v_swing_entity:        { domain: "select", re: /_v_swing$/ },
+      h_swing_entity:        { domain: "select", re: /_h_swing$/ },
+      converti_entity:       { domain: "select", re: /_converti$/ },
+      energy_daily_entity:   { domain: "sensor", re: /_energy_daily$/ },
+      energy_weekly_entity:  { domain: "sensor", re: /_energy_weekly$/ },
+      energy_monthly_entity: { domain: "sensor", re: /_energy_monthly$/ },
+      rssi_entity:           { domain: "sensor", re: /_rssi$/ },
+    };
+
+    // Build a quick index of same-device entity ids grouped by domain.
+    const byDomain = {};
+    for (const [eid, info] of Object.entries(this.hass.entities)) {
+      if (info.device_id !== deviceId) continue;
+      const dot = eid.indexOf(".");
+      if (dot < 0) continue;
+      const dom = eid.slice(0, dot);
+      (byDomain[dom] = byDomain[dom] || []).push(eid);
+    }
+
+    for (const [key, { domain, re }] of Object.entries(matchMap)) {
+      // User explicitly set this in YAML → never override.
+      if (this._userSet && this._userSet.has(key)) continue;
+      // Current value works → keep it.
+      if (this.config[key] && this.hass.states[this.config[key]]) continue;
+      // Find first same-device entity that matches the suffix pattern.
+      const match = (byDomain[domain] || []).find((eid) => re.test(eid));
+      if (match) this.config[key] = match;
+    }
   }
 
   getCardSize() { return 6; }
@@ -606,6 +658,10 @@ class KprMiraieCard extends LitElement {
 
   render() {
     if (!this.hass || !this.config) return html``;
+
+    // Re-resolve any companion entity IDs that don't exist in hass.states by
+    // looking them up via the climate entity's device_id. Handles renames.
+    this._resolveEntitiesByDevice();
 
     const stateObj = this._getState(this.config.entity);
     if (!stateObj) return html`<ha-card>Entity not found: ${this.config.entity}</ha-card>`;

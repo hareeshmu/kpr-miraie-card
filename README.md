@@ -195,6 +195,13 @@ keep working unchanged (same entity ID, just renamed in the UI).
 
 ## Changelog
 
+### 1.3.4
+- **Auto-derive survives climate renames.** If you rename `climate.kpr_<id>` to
+  something friendlier (e.g. `climate.master_ac`), the card now finds all the
+  companion switches, selects, and sensors by looking them up in HA's entity
+  registry via the climate entity's `device_id` — no manual YAML required.
+  User-supplied entity overrides in YAML are always respected.
+
 ### 1.3.3
 - ⋮ header button now opens an **inline dropdown** directly on the card instead
   of jumping straight to HA's more-info dialog. Three actions:

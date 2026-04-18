@@ -1,4 +1,4 @@
-console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font-weight:700;padding:2px 4px;border-radius:3px 0 0 3px;","background:#11151e;color:#00bfff;font-weight:700;padding:2px 4px;border-radius:0 3px 3px 0;");const e=Object.getPrototypeOf(customElements.get("ha-panel-lovelace")),t=e.prototype.html,i=e.prototype.css;customElements.define("kpr-miraie-card",class extends e{static get properties(){return{hass:{type:Object},config:{type:Object},_time:{type:Number},_expandVSwing:{type:Boolean},_expandHSwing:{type:Boolean},_expandConverti:{type:Boolean},_expandFeatures:{type:Boolean},_expandEnergy:{type:Boolean},_showMoreModes:{type:Boolean},_showMoreMenu:{type:Boolean},_dragTargetTemp:{type:Number}}}constructor(){super(),this._expandVSwing=!1,this._expandHSwing=!1,this._expandConverti=!1,this._expandFeatures=!1,this._expandEnergy=!1,this._showMoreMenu=!1,this._dragTargetTemp=null}_closeAllPopups(){this._expandVSwing=!1,this._expandHSwing=!1,this._expandConverti=!1,this._expandFeatures=!1,this._expandEnergy=!1}connectedCallback(){super.connectedCallback(),this._time=Date.now(),this._timer=setInterval(()=>{this._time=Date.now()},3e4)}disconnectedCallback(){super.disconnectedCallback(),clearInterval(this._timer)}updated(){const e=this.shadowRoot;if(!e||!this._ticks)return;const t="http://www.w3.org/2000/svg",i=e.querySelector(".tick-group-bg"),o=e.querySelector(".tick-group-glow"),a=e.querySelector(".tick-group-lit");if(!i||!o||!a)return;const{modeColor:n,dimTickColor:s,tickW:r}=this._tickStyle;i.replaceChildren(),o.replaceChildren(),a.replaceChildren();for(const e of this._ticks){const l=i=>{const o=document.createElementNS(t,"line");return o.setAttribute("x1",e.p1.x),o.setAttribute("y1",e.p1.y),o.setAttribute("x2",e.p2.x),o.setAttribute("y2",e.p2.y),o.setAttribute("stroke",i.stroke),o.setAttribute("stroke-width",i.width),o.setAttribute("stroke-linecap",i.cap),null!=i.opacity&&o.setAttribute("opacity",i.opacity),o};i.appendChild(l({stroke:s,width:r,cap:"butt",opacity:.55})),e.lit&&(o.appendChild(l({stroke:n,width:4,cap:"round",opacity:.25})),a.appendChild(l({stroke:n,width:r,cap:"butt"})))}const l=e.querySelector(".needle-group");if(l){l.replaceChildren();const e=this._needleState;if(e&&e.visible){const i=(i,o,a)=>{const n=document.createElementNS(t,"line");return n.setAttribute("x1",e.needleA.x),n.setAttribute("y1",e.needleA.y),n.setAttribute("x2",e.needleB.x),n.setAttribute("y2",e.needleB.y),n.setAttribute("stroke",e.needleColor),n.setAttribute("stroke-width",i),n.setAttribute("stroke-linecap","round"),null!=o&&n.setAttribute("opacity",o),a&&n.setAttribute("style",`filter: drop-shadow(0 0 3px ${e.needleColor})`),n};l.appendChild(i(6,.25,!1)),l.appendChild(i(3,null,!0))}}const c=e.querySelector(".handle-group");if(c){c.replaceChildren();const e=this._handleState;if(e&&e.visible){const i=document.createElementNS(t,"circle");i.setAttribute("cx",e.handle.x),i.setAttribute("cy",e.handle.y),i.setAttribute("r",16),i.setAttribute("fill",e.modeColor),i.setAttribute("opacity",.45),c.appendChild(i);const o=document.createElementNS(t,"circle");o.setAttribute("cx",e.handle.x),o.setAttribute("cy",e.handle.y),o.setAttribute("r",8),o.setAttribute("fill","#ffffff"),o.setAttribute("stroke",e.modeColor),o.setAttribute("stroke-width",3),o.setAttribute("style",`cursor: grab; filter: drop-shadow(0 0 6px ${e.modeColor})`),c.appendChild(o)}}const d=e.querySelector(".particles");if(d&&!d.dataset.seeded){const e=(e,t)=>e+Math.random()*(t-e);for(let t=0;t<7;t++){const t=document.createElement("span");t.className="snowflake";const i=document.createElement("span");i.className="sway";const o=document.createElement("span");o.className="spin",o.textContent="❄",i.appendChild(o),t.appendChild(i),t.style.left=`${e(3,97).toFixed(1)}%`,t.style.fontSize=`${e(8,24).toFixed(1)}px`,t.style.setProperty("--fall-dur",`${e(5,12).toFixed(2)}s`),t.style.setProperty("--fall-delay",`-${e(0,12).toFixed(2)}s`),i.style.setProperty("--sway-dur",`${e(1.8,4.5).toFixed(2)}s`),i.style.setProperty("--sway-delay",`-${e(0,4).toFixed(2)}s`),i.style.setProperty("--sway-amp",`${e(4,22).toFixed(1)}px`),o.style.setProperty("--spin-dur",`${e(4,14).toFixed(2)}s`);const a=Math.random()<.5?-1:1;o.style.setProperty("--spin-amount",`${(e(120,540)*a).toFixed(0)}deg`),d.appendChild(t)}d.dataset.seeded="1"}}setConfig(e){if(!e.entity)throw new Error("Please define a climate entity");const t=e.entity.match(/^climate\.(.+)$/),i=t?t[1]:null,o=(e,t)=>i?`${e}.${i}_${t}`:"";this.config={entity:e.entity,name:e.name||"",eco_entity:e.eco_entity||o("switch","acem"),clean_entity:e.clean_entity||o("switch","acec"),powerful_entity:e.powerful_entity||o("switch","acpm"),nanoe_entity:e.nanoe_entity||o("switch","acng"),display_entity:e.display_entity||o("switch","acdc"),buzzer_entity:e.buzzer_entity||o("switch","bzr"),v_swing_entity:e.v_swing_entity||o("select","v_swing"),h_swing_entity:e.h_swing_entity||o("select","h_swing"),converti_entity:e.converti_entity||o("select","converti"),room_temp_entity:e.room_temp_entity||"",energy_daily_entity:e.energy_daily_entity||o("sensor","energy_daily"),energy_weekly_entity:e.energy_weekly_entity||o("sensor","energy_weekly"),energy_monthly_entity:e.energy_monthly_entity||o("sensor","energy_monthly"),rssi_entity:e.rssi_entity||o("sensor","rssi"),show_energy:!1!==e.show_energy,show_swing:!1!==e.show_swing,show_extras:!1!==e.show_extras}}getCardSize(){return 6}static getStubConfig(){return{entity:"climate.miraie_living_room"}}_getState(e){return e&&this.hass?this.hass.states[e]:void 0}_callService(e,t,i){this.hass.callService(e,t,i)}_setClimateMode(e){this._callService("climate","set_hvac_mode",{entity_id:this.config.entity,hvac_mode:e})}_setTemp(e){this._callService("climate","set_temperature",{entity_id:this.config.entity,temperature:e})}_setFanMode(e){this._callService("climate","set_fan_mode",{entity_id:this.config.entity,fan_mode:e})}_toggleSwitch(e){const t=this._getState(e);t&&this._callService("switch","on"===t.state?"turn_off":"turn_on",{entity_id:e})}_setSelect(e,t){this._callService("select","select_option",{entity_id:e,option:t})}_moreInfoDetails(){const e=new Event("hass-more-info",{bubbles:!0,composed:!0});e.detail={entityId:this.config.entity},this.dispatchEvent(e),this._showMoreMenu=!1}_openDeviceInfo(){const e=this.hass&&this.hass.entities&&this.hass.entities[this.config.entity],t=e&&e.device_id;t?(history.pushState(null,"",`/config/devices/device/${t}`),window.dispatchEvent(new Event("location-changed"))):this._moreInfoDetails(),this._showMoreMenu=!1}_openRelated(){new Event("hass-action",{bubbles:!0,composed:!0}).detail={config:{tap_action:{action:"more-info"}},action:"tap",entity:this.config.entity},this._moreInfoDetails()}_cycleFan(e,t){const i=["auto","quiet","low","medium","high"],o=i.indexOf(t);this._setFanMode(i[(o+e+i.length)%i.length])}_getModeColor(e){return{cool:"#00bfff",heat:"#ff1493",auto:"#2fd1c5",dry:"#ff8c00",fan_only:"#87ceeb",off:"#616161"}[e]||"#616161"}_getModeIcon(e){return{cool:"mdi:snowflake",heat:"mdi:fire",auto:"mdi:autorenew",dry:"mdi:water-percent",fan_only:"mdi:fan",off:"mdi:power"}[e]||"mdi:help-circle"}_getFanIcon(e){return{auto:"mdi:fan-auto",quiet:"mdi:fan-speed-1",low:"mdi:fan-speed-1",medium:"mdi:fan-speed-2",high:"mdi:fan-speed-3"}[e]||"mdi:fan"}_relativeTime(e){if(!e)return"";const t=Date.parse(e);if(Number.isNaN(t))return"";const i=this._time||Date.now(),o=Math.max(0,Math.floor((i-t)/1e3));if(o<60)return`${o}s ago`;const a=Math.floor(o/60);if(a<60)return`${a}m ago`;const n=Math.floor(a/60);return n<24?`${n}h ago`:`${Math.floor(n/24)}d ago`}_rssiIcon(e){if(null==e||Number.isNaN(Number(e)))return"mdi:wifi-strength-outline";const t=Number(e);return t>=-50?"mdi:wifi-strength-4":t>=-60?"mdi:wifi-strength-3":t>=-70?"mdi:wifi-strength-2":t>=-80?"mdi:wifi-strength-1":"mdi:wifi-strength-outline"}_renderVentIcon(e,i){const o=i?-90:0;if("Auto"===e)return t`
+console.info("%c KPR-MIRAIE-CARD %c v1.3.4 ","background:#00bfff;color:#000;font-weight:700;padding:2px 4px;border-radius:3px 0 0 3px;","background:#11151e;color:#00bfff;font-weight:700;padding:2px 4px;border-radius:0 3px 3px 0;");const e=Object.getPrototypeOf(customElements.get("ha-panel-lovelace")),t=e.prototype.html,i=e.prototype.css;customElements.define("kpr-miraie-card",class extends e{static get properties(){return{hass:{type:Object},config:{type:Object},_time:{type:Number},_expandVSwing:{type:Boolean},_expandHSwing:{type:Boolean},_expandConverti:{type:Boolean},_expandFeatures:{type:Boolean},_expandEnergy:{type:Boolean},_showMoreModes:{type:Boolean},_showMoreMenu:{type:Boolean},_dragTargetTemp:{type:Number}}}constructor(){super(),this._expandVSwing=!1,this._expandHSwing=!1,this._expandConverti=!1,this._expandFeatures=!1,this._expandEnergy=!1,this._showMoreMenu=!1,this._dragTargetTemp=null}_closeAllPopups(){this._expandVSwing=!1,this._expandHSwing=!1,this._expandConverti=!1,this._expandFeatures=!1,this._expandEnergy=!1}connectedCallback(){super.connectedCallback(),this._time=Date.now(),this._timer=setInterval(()=>{this._time=Date.now()},3e4)}disconnectedCallback(){super.disconnectedCallback(),clearInterval(this._timer)}updated(){const e=this.shadowRoot;if(!e||!this._ticks)return;const t="http://www.w3.org/2000/svg",i=e.querySelector(".tick-group-bg"),o=e.querySelector(".tick-group-glow"),n=e.querySelector(".tick-group-lit");if(!i||!o||!n)return;const{modeColor:a,dimTickColor:s,tickW:r}=this._tickStyle;i.replaceChildren(),o.replaceChildren(),n.replaceChildren();for(const e of this._ticks){const c=i=>{const o=document.createElementNS(t,"line");return o.setAttribute("x1",e.p1.x),o.setAttribute("y1",e.p1.y),o.setAttribute("x2",e.p2.x),o.setAttribute("y2",e.p2.y),o.setAttribute("stroke",i.stroke),o.setAttribute("stroke-width",i.width),o.setAttribute("stroke-linecap",i.cap),null!=i.opacity&&o.setAttribute("opacity",i.opacity),o};i.appendChild(c({stroke:s,width:r,cap:"butt",opacity:.55})),e.lit&&(o.appendChild(c({stroke:a,width:4,cap:"round",opacity:.25})),n.appendChild(c({stroke:a,width:r,cap:"butt"})))}const c=e.querySelector(".needle-group");if(c){c.replaceChildren();const e=this._needleState;if(e&&e.visible){const i=(i,o,n)=>{const a=document.createElementNS(t,"line");return a.setAttribute("x1",e.needleA.x),a.setAttribute("y1",e.needleA.y),a.setAttribute("x2",e.needleB.x),a.setAttribute("y2",e.needleB.y),a.setAttribute("stroke",e.needleColor),a.setAttribute("stroke-width",i),a.setAttribute("stroke-linecap","round"),null!=o&&a.setAttribute("opacity",o),n&&a.setAttribute("style",`filter: drop-shadow(0 0 3px ${e.needleColor})`),a};c.appendChild(i(6,.25,!1)),c.appendChild(i(3,null,!0))}}const l=e.querySelector(".handle-group");if(l){l.replaceChildren();const e=this._handleState;if(e&&e.visible){const i=document.createElementNS(t,"circle");i.setAttribute("cx",e.handle.x),i.setAttribute("cy",e.handle.y),i.setAttribute("r",16),i.setAttribute("fill",e.modeColor),i.setAttribute("opacity",.45),l.appendChild(i);const o=document.createElementNS(t,"circle");o.setAttribute("cx",e.handle.x),o.setAttribute("cy",e.handle.y),o.setAttribute("r",8),o.setAttribute("fill","#ffffff"),o.setAttribute("stroke",e.modeColor),o.setAttribute("stroke-width",3),o.setAttribute("style",`cursor: grab; filter: drop-shadow(0 0 6px ${e.modeColor})`),l.appendChild(o)}}const d=e.querySelector(".particles");if(d&&!d.dataset.seeded){const e=(e,t)=>e+Math.random()*(t-e);for(let t=0;t<7;t++){const t=document.createElement("span");t.className="snowflake";const i=document.createElement("span");i.className="sway";const o=document.createElement("span");o.className="spin",o.textContent="❄",i.appendChild(o),t.appendChild(i),t.style.left=`${e(3,97).toFixed(1)}%`,t.style.fontSize=`${e(8,24).toFixed(1)}px`,t.style.setProperty("--fall-dur",`${e(5,12).toFixed(2)}s`),t.style.setProperty("--fall-delay",`-${e(0,12).toFixed(2)}s`),i.style.setProperty("--sway-dur",`${e(1.8,4.5).toFixed(2)}s`),i.style.setProperty("--sway-delay",`-${e(0,4).toFixed(2)}s`),i.style.setProperty("--sway-amp",`${e(4,22).toFixed(1)}px`),o.style.setProperty("--spin-dur",`${e(4,14).toFixed(2)}s`);const n=Math.random()<.5?-1:1;o.style.setProperty("--spin-amount",`${(e(120,540)*n).toFixed(0)}deg`),d.appendChild(t)}d.dataset.seeded="1"}}setConfig(e){if(!e.entity)throw new Error("Please define a climate entity");const t=e.entity.match(/^climate\.(.+)$/),i=t?t[1]:null,o=(e,t)=>i?`${e}.${i}_${t}`:"";this.config={entity:e.entity,name:e.name||"",eco_entity:e.eco_entity||o("switch","acem"),clean_entity:e.clean_entity||o("switch","acec"),powerful_entity:e.powerful_entity||o("switch","acpm"),nanoe_entity:e.nanoe_entity||o("switch","acng"),display_entity:e.display_entity||o("switch","acdc"),buzzer_entity:e.buzzer_entity||o("switch","bzr"),v_swing_entity:e.v_swing_entity||o("select","v_swing"),h_swing_entity:e.h_swing_entity||o("select","h_swing"),converti_entity:e.converti_entity||o("select","converti"),room_temp_entity:e.room_temp_entity||"",energy_daily_entity:e.energy_daily_entity||o("sensor","energy_daily"),energy_weekly_entity:e.energy_weekly_entity||o("sensor","energy_weekly"),energy_monthly_entity:e.energy_monthly_entity||o("sensor","energy_monthly"),rssi_entity:e.rssi_entity||o("sensor","rssi"),show_energy:!1!==e.show_energy,show_swing:!1!==e.show_swing,show_extras:!1!==e.show_extras},this._userSet=new Set(Object.keys(e))}_resolveEntitiesByDevice(){if(!this.hass||!this.hass.entities)return;const e=this.hass.entities[this.config.entity],t=e&&e.device_id;if(!t)return;const i={eco_entity:{domain:"switch",re:/_acem$/},clean_entity:{domain:"switch",re:/_acec$/},powerful_entity:{domain:"switch",re:/_acpm$/},nanoe_entity:{domain:"switch",re:/_acng$/},display_entity:{domain:"switch",re:/_acdc$/},buzzer_entity:{domain:"switch",re:/_bzr$/},v_swing_entity:{domain:"select",re:/_v_swing$/},h_swing_entity:{domain:"select",re:/_h_swing$/},converti_entity:{domain:"select",re:/_converti$/},energy_daily_entity:{domain:"sensor",re:/_energy_daily$/},energy_weekly_entity:{domain:"sensor",re:/_energy_weekly$/},energy_monthly_entity:{domain:"sensor",re:/_energy_monthly$/},rssi_entity:{domain:"sensor",re:/_rssi$/}},o={};for(const[e,i]of Object.entries(this.hass.entities)){if(i.device_id!==t)continue;const n=e.indexOf(".");if(n<0)continue;const a=e.slice(0,n);(o[a]=o[a]||[]).push(e)}for(const[e,{domain:t,re:n}]of Object.entries(i)){if(this._userSet&&this._userSet.has(e))continue;if(this.config[e]&&this.hass.states[this.config[e]])continue;const i=(o[t]||[]).find(e=>n.test(e));i&&(this.config[e]=i)}}getCardSize(){return 6}static getStubConfig(){return{entity:"climate.miraie_living_room"}}_getState(e){return e&&this.hass?this.hass.states[e]:void 0}_callService(e,t,i){this.hass.callService(e,t,i)}_setClimateMode(e){this._callService("climate","set_hvac_mode",{entity_id:this.config.entity,hvac_mode:e})}_setTemp(e){this._callService("climate","set_temperature",{entity_id:this.config.entity,temperature:e})}_setFanMode(e){this._callService("climate","set_fan_mode",{entity_id:this.config.entity,fan_mode:e})}_toggleSwitch(e){const t=this._getState(e);t&&this._callService("switch","on"===t.state?"turn_off":"turn_on",{entity_id:e})}_setSelect(e,t){this._callService("select","select_option",{entity_id:e,option:t})}_moreInfoDetails(){const e=new Event("hass-more-info",{bubbles:!0,composed:!0});e.detail={entityId:this.config.entity},this.dispatchEvent(e),this._showMoreMenu=!1}_openDeviceInfo(){const e=this.hass&&this.hass.entities&&this.hass.entities[this.config.entity],t=e&&e.device_id;t?(history.pushState(null,"",`/config/devices/device/${t}`),window.dispatchEvent(new Event("location-changed"))):this._moreInfoDetails(),this._showMoreMenu=!1}_openRelated(){new Event("hass-action",{bubbles:!0,composed:!0}).detail={config:{tap_action:{action:"more-info"}},action:"tap",entity:this.config.entity},this._moreInfoDetails()}_cycleFan(e,t){const i=["auto","quiet","low","medium","high"],o=i.indexOf(t);this._setFanMode(i[(o+e+i.length)%i.length])}_getModeColor(e){return{cool:"#00bfff",heat:"#ff1493",auto:"#2fd1c5",dry:"#ff8c00",fan_only:"#87ceeb",off:"#616161"}[e]||"#616161"}_getModeIcon(e){return{cool:"mdi:snowflake",heat:"mdi:fire",auto:"mdi:autorenew",dry:"mdi:water-percent",fan_only:"mdi:fan",off:"mdi:power"}[e]||"mdi:help-circle"}_getFanIcon(e){return{auto:"mdi:fan-auto",quiet:"mdi:fan-speed-1",low:"mdi:fan-speed-1",medium:"mdi:fan-speed-2",high:"mdi:fan-speed-3"}[e]||"mdi:fan"}_relativeTime(e){if(!e)return"";const t=Date.parse(e);if(Number.isNaN(t))return"";const i=this._time||Date.now(),o=Math.max(0,Math.floor((i-t)/1e3));if(o<60)return`${o}s ago`;const n=Math.floor(o/60);if(n<60)return`${n}m ago`;const a=Math.floor(n/60);return a<24?`${a}h ago`:`${Math.floor(a/24)}d ago`}_rssiIcon(e){if(null==e||Number.isNaN(Number(e)))return"mdi:wifi-strength-outline";const t=Number(e);return t>=-50?"mdi:wifi-strength-4":t>=-60?"mdi:wifi-strength-3":t>=-70?"mdi:wifi-strength-2":t>=-80?"mdi:wifi-strength-1":"mdi:wifi-strength-outline"}_renderVentIcon(e,i){const o=i?-90:0;if("Auto"===e)return t`
         <svg viewBox="0 0 24 24" width="22" height="22" style="transform: rotate(${o}deg)">
           <rect x="3" y="4" width="18" height="2" rx="1" fill="currentColor"/>
           <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.9">
@@ -9,19 +9,19 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
             <line x1="12" y1="7" x2="12" y2="20" transform="rotate(60 12 6)"/>
           </g>
         </svg>
-      `;const a=parseInt(e,10);return t`
+      `;const n=parseInt(e,10);return t`
       <svg viewBox="0 0 24 24" width="22" height="22" style="transform: rotate(${o}deg)">
         <rect x="3" y="4" width="18" height="2" rx="1" fill="currentColor"/>
-        <g transform="rotate(${30*(a-1)-60} 12 6)" stroke="currentColor" stroke-linecap="round">
+        <g transform="rotate(${30*(n-1)-60} 12 6)" stroke="currentColor" stroke-linecap="round">
           <line x1="8"  y1="8" x2="8"  y2="20" stroke-width="1.3" opacity="0.6"/>
           <line x1="12" y1="8" x2="12" y2="22" stroke-width="1.8" opacity="1"/>
           <line x1="16" y1="8" x2="16" y2="20" stroke-width="1.3" opacity="0.6"/>
         </g>
       </svg>
-    `}_renderDial(e,i,o,a,n,s,r=!1){const l=140,c=140,d=280,p=210,h=510,g=300,u=a?0:Math.max(0,Math.min(1,(i-16)/18)),f=p+u*g,m=null!=e?Math.max(0,Math.min(1,(e-16)/18)):null,b=null!=m?p+m*g:p,y=(e,t)=>{const i=(e-90)*Math.PI/180;return{x:l+t*Math.cos(i),y:c+t*Math.sin(i)}},x=(e,t,i)=>{const o=y(e,i),a=y(t,i),n=t-e>180?1:0;return`M ${o.x} ${o.y} A ${i} ${i} 0 ${n} 1 ${a.x} ${a.y}`},w=[];for(let e=0;e<80;e++){const t=e/79,i=p+t*g,o=y(i,103),n=y(i,129);w.push({p1:o,p2:n,lit:!a&&t<=u})}this._ticks=w,this._tickStyle={modeColor:o,dimTickColor:"#6b7280",tickW:2};const v=y(f,116),_=null!=b?y(b,141):null,k=null!=b?y(b,101):null;this._handleState={handle:v,modeColor:o,visible:!a},this._needleState={needleA:_,needleB:k,needleColor:"#ffffff",visible:!a&&_&&k};const $=x(p,a||null==b?h:b,136),C=a||null==b?"":x(b,h,136),S=x(p,h,139),M=e=>{const t=this.shadowRoot.querySelector(".dial-svg");if(!t)return null;e.cancelable&&e.type&&e.type.startsWith("touch")&&e.preventDefault();const i=t.getBoundingClientRect();if(i.width<=0)return null;const o=d/i.width,a=e.touches?e.touches[0]:e;if(!a)return null;const n=(a.clientX-i.left)*o,s=(a.clientY-i.top)*o;let r=180*Math.atan2(s-c,n-l)/Math.PI+90;if(r<0&&(r+=360),r<150&&(r+=360),r<195||r>525)return null;const h=16+18*Math.max(0,Math.min(1,(r-p)/g)),u=Math.min(30,Math.max(16,h));return Math.round(2*u)/2},z=e=>{const t=M(e);null!=t&&t!==this._dragTargetTemp&&(this._dragTargetTemp=t,this.requestUpdate())},A=e=>{const t=this.shadowRoot.querySelector(".dial-svg");if(!t)return!1;const i=t.getBoundingClientRect();if(i.width<=0)return!1;const o=d/i.width,a=e.touches?e.touches[0]:e;if(!a)return!1;const n=(a.clientX-i.left)*o,s=(a.clientY-i.top)*o,r=n-v.x,l=s-v.y;return Math.sqrt(r*r+l*l)<=22},F=e=>{if(a)return;if(!A(e))return;e.preventDefault();const t=M(e);null!=t&&(this._dragTargetTemp=t,this.requestUpdate());const i=e=>z(e),o=()=>{if(window.removeEventListener("mousemove",i),window.removeEventListener("mouseup",o),window.removeEventListener("touchmove",i),window.removeEventListener("touchend",o),null!=this._dragTargetTemp){const e=this._dragTargetTemp;this._setTemp(e),this._dragHoldTimer&&clearTimeout(this._dragHoldTimer),this._dragHoldTimer=setTimeout(()=>{this._dragTargetTemp=null,this._dragHoldTimer=null,this.requestUpdate()},2e3)}};window.addEventListener("mousemove",i),window.addEventListener("mouseup",o),window.addEventListener("touchmove",i,{passive:!1}),window.addEventListener("touchend",o)},E="fan_only"===n?"Fan":a?"Off":n.charAt(0).toUpperCase()+n.slice(1),q=s?s.toUpperCase():"";return t`
+    `}_renderDial(e,i,o,n,a,s,r=!1){const c=140,l=140,d=280,p=210,h=510,g=300,u=n?0:Math.max(0,Math.min(1,(i-16)/18)),f=p+u*g,m=null!=e?Math.max(0,Math.min(1,(e-16)/18)):null,y=null!=m?p+m*g:p,b=(e,t)=>{const i=(e-90)*Math.PI/180;return{x:c+t*Math.cos(i),y:l+t*Math.sin(i)}},x=(e,t,i)=>{const o=b(e,i),n=b(t,i),a=t-e>180?1:0;return`M ${o.x} ${o.y} A ${i} ${i} 0 ${a} 1 ${n.x} ${n.y}`},w=[];for(let e=0;e<80;e++){const t=e/79,i=p+t*g,o=b(i,103),a=b(i,129);w.push({p1:o,p2:a,lit:!n&&t<=u})}this._ticks=w,this._tickStyle={modeColor:o,dimTickColor:"#6b7280",tickW:2};const v=b(f,116),_=null!=y?b(y,141):null,k=null!=y?b(y,101):null;this._handleState={handle:v,modeColor:o,visible:!n},this._needleState={needleA:_,needleB:k,needleColor:"#ffffff",visible:!n&&_&&k};const $=x(p,n||null==y?h:y,136),S=n||null==y?"":x(y,h,136),C=x(p,h,139),M=e=>{const t=this.shadowRoot.querySelector(".dial-svg");if(!t)return null;e.cancelable&&e.type&&e.type.startsWith("touch")&&e.preventDefault();const i=t.getBoundingClientRect();if(i.width<=0)return null;const o=d/i.width,n=e.touches?e.touches[0]:e;if(!n)return null;const a=(n.clientX-i.left)*o,s=(n.clientY-i.top)*o;let r=180*Math.atan2(s-l,a-c)/Math.PI+90;if(r<0&&(r+=360),r<150&&(r+=360),r<195||r>525)return null;const h=16+18*Math.max(0,Math.min(1,(r-p)/g)),u=Math.min(30,Math.max(16,h));return Math.round(2*u)/2},z=e=>{const t=M(e);null!=t&&t!==this._dragTargetTemp&&(this._dragTargetTemp=t,this.requestUpdate())},A=e=>{const t=this.shadowRoot.querySelector(".dial-svg");if(!t)return!1;const i=t.getBoundingClientRect();if(i.width<=0)return!1;const o=d/i.width,n=e.touches?e.touches[0]:e;if(!n)return!1;const a=(n.clientX-i.left)*o,s=(n.clientY-i.top)*o,r=a-v.x,c=s-v.y;return Math.sqrt(r*r+c*c)<=22},E=e=>{if(n)return;if(!A(e))return;e.preventDefault();const t=M(e);null!=t&&(this._dragTargetTemp=t,this.requestUpdate());const i=e=>z(e),o=()=>{if(window.removeEventListener("mousemove",i),window.removeEventListener("mouseup",o),window.removeEventListener("touchmove",i),window.removeEventListener("touchend",o),null!=this._dragTargetTemp){const e=this._dragTargetTemp;this._setTemp(e),this._dragHoldTimer&&clearTimeout(this._dragHoldTimer),this._dragHoldTimer=setTimeout(()=>{this._dragTargetTemp=null,this._dragHoldTimer=null,this.requestUpdate()},2e3)}};window.addEventListener("mousemove",i),window.addEventListener("mouseup",o),window.addEventListener("touchmove",i,{passive:!1}),window.addEventListener("touchend",o)},F="fan_only"===a?"Fan":n?"Off":a.charAt(0).toUpperCase()+a.slice(1),q=s?s.toUpperCase():"";return t`
       <div class="dial-container" style="--mode-color: ${o}">
         <svg class="dial-svg" viewBox="0 0 ${d} ${d}"
-          @mousedown=${F} @touchstart=${F}>
+          @mousedown=${E} @touchstart=${E}>
           <defs>
             <!-- Outer halo radial gradient — concentrated between 82%(r=131) and 100%(r=158) -->
             <radialGradient id="kpr-halo-grad" cx="50%" cy="50%" r="50%">
@@ -34,23 +34,23 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
           </defs>
 
           <!-- Layer 0: Animated halo (soft pulsing glow — tracks mode color) -->
-          <circle cx="${l}" cy="${c}" r="158" fill="url(#kpr-halo-grad)"
-            class="halo-pulse" style="${a?"display:none":""}"/>
+          <circle cx="${c}" cy="${l}" r="158" fill="url(#kpr-halo-grad)"
+            class="halo-pulse" style="${n?"display:none":""}"/>
 
           <!-- Layer 1: Dark face extending under the full arc -->
-          <circle cx="${l}" cy="${c}" r="136" fill="#0a0f18"/>
+          <circle cx="${c}" cy="${l}" r="136" fill="#0a0f18"/>
 
           <!-- Layer 1b: Thick track — full circle so color is uniform across bottom gap -->
-          <circle cx="${l}" cy="${c}" r="108" fill="none" stroke="#0c1118" stroke-width="46"/>
+          <circle cx="${c}" cy="${l}" r="108" fill="none" stroke="#0c1118" stroke-width="46"/>
 
           <!-- Layer 2a: Outer arc cool segment (startA → needle angle) -->
           <path d="${$}" fill="none" stroke="#3a4658" stroke-width="10"
-            stroke-linecap="butt" opacity="${a?.5:.95}"/>
+            stroke-linecap="butt" opacity="${n?.5:.95}"/>
           <!-- Layer 2b: Outer arc warm segment (needle → endA, "hotter than room" zone) -->
-          <path d="${C}" fill="none" stroke="#ff6b35" stroke-width="10"
-            stroke-linecap="butt" opacity="${a?0:.75}"/>
+          <path d="${S}" fill="none" stroke="#ff6b35" stroke-width="10"
+            stroke-linecap="butt" opacity="${n?0:.75}"/>
           <!-- Layer 3: Thin bright rim along outer edge of arc (full sweep) -->
-          <path d="${S}" fill="none" stroke="#8d9bb0" stroke-width="1"
+          <path d="${C}" fill="none" stroke="#8d9bb0" stroke-width="1"
             stroke-linecap="butt" opacity="0.6"/>
 
           <!-- Tick groups — populated in updated() via createElementNS (SVG namespace) -->
@@ -62,14 +62,14 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
           <g class="needle-group"></g>
 
           <!-- Inner text face (bg circle for temp/room/mode text) -->
-          <circle cx="${l}" cy="${c}" r="95" fill="#05080d"/>
+          <circle cx="${c}" cy="${l}" r="95" fill="#05080d"/>
 
           <!-- Handle — populated in updated() via createElementNS -->
           <g class="handle-group"></g>
         </svg>
 
         <!-- Falling snowflakes (populated in updated() once, toggled by 'active' class) -->
-        <div class="particles ${a||"cool"!==n?"":"active"}"></div>
+        <div class="particles ${n||"cool"!==a?"":"active"}"></div>
 
         <!-- Center text stack -->
         <div class="dial-center">
@@ -80,7 +80,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
             </div>
             <div class="dial-unavailable">Device unavailable</div>
           `:t`
-            ${(()=>{const e=this._getState(this.config.powerful_entity);return!a&&e&&"on"===e.state?t`
+            ${(()=>{const e=this._getState(this.config.powerful_entity);return!n&&e&&"on"===e.state?t`
                 <div class="boost-badge" title="Boost active">
                   <ha-icon icon="mdi:rocket-launch"></ha-icon>
                   <span>BOOST</span>
@@ -88,13 +88,13 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
               `:""})()}
             <div class="mode-row">
               <ha-icon class="mode-icon"
-                icon="${this._getModeIcon(n)}"
-                style="color: ${a?"#616161":o}"></ha-icon>
+                icon="${this._getModeIcon(a)}"
+                style="color: ${n?"#616161":o}"></ha-icon>
               <span class="mode-label"
-                style="color: ${a?"#616161":o}">${E}</span>
+                style="color: ${n?"#616161":o}">${F}</span>
             </div>
-            <div class="dial-temp">${a?null!=e?Number(e).toFixed(1):"--":null!=i?Number(i).toFixed(1):"--"}<span class="unit">°C</span></div>
-            ${a?t`<div class="room-temp">Powered Off</div>`:t`
+            <div class="dial-temp">${n?null!=e?Number(e).toFixed(1):"--":null!=i?Number(i).toFixed(1):"--"}<span class="unit">°C</span></div>
+            ${n?t`<div class="room-temp">Powered Off</div>`:t`
               <div class="room-temp">
                 <span class="room-val-wrap">${null!=e?Number(e).toFixed(1):"--"}°C</span>
               </div>
@@ -104,7 +104,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
         </div>
 
         <!-- Fan speed label — sits inside the 60° bottom gap of the tick ring -->
-        ${a?"":t`
+        ${n?"":t`
           <div class="fan-gap-label">
             <span class="fan-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="1.4em" height="1.4em" fill="currentColor">
@@ -115,7 +115,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
           </div>
         `}
       </div>
-    `}render(){if(!this.hass||!this.config)return t``;const e=this._getState(this.config.entity);if(!e)return t`<ha-card>Entity not found: ${this.config.entity}</ha-card>`;const i=e.state,o=e.attributes.current_temperature,a=e.attributes.temperature,n=e.attributes.fan_mode||"auto",s="unavailable"===i||"unknown"===i||"unavailable"===e.state,r=s?"#616161":this._getModeColor(i),l="off"===i||s,c=this._getState(this.config.energy_daily_entity),d=this._getState(this.config.energy_weekly_entity),p=this._getState(this.config.energy_monthly_entity),h=c||d||p,g=this._getState(this.config.eco_entity),u=this._getState(this.config.clean_entity),f=this._getState(this.config.powerful_entity),m=this._getState(this.config.nanoe_entity),b=this._getState(this.config.display_entity),y=this._getState(this.config.buzzer_entity),x=this._getState(this.config.v_swing_entity),w=this._getState(this.config.h_swing_entity),v=this._getState(this.config.converti_entity);n.charAt(0).toUpperCase(),n.slice(1);const _=[{key:"heat",icon:"mdi:fire",label:"Heat"},{key:"fan_only",icon:"mdi:fan",label:"Fan"},{key:"dry",icon:"mdi:water-percent",label:"Dry"}],k=_.some(e=>e.key===i),$=this.config.name||e.attributes.friendly_name||"";return t`
+    `}render(){if(!this.hass||!this.config)return t``;this._resolveEntitiesByDevice();const e=this._getState(this.config.entity);if(!e)return t`<ha-card>Entity not found: ${this.config.entity}</ha-card>`;const i=e.state,o=e.attributes.current_temperature,n=e.attributes.temperature,a=e.attributes.fan_mode||"auto",s="unavailable"===i||"unknown"===i||"unavailable"===e.state,r=s?"#616161":this._getModeColor(i),c="off"===i||s,l=this._getState(this.config.energy_daily_entity),d=this._getState(this.config.energy_weekly_entity),p=this._getState(this.config.energy_monthly_entity),h=l||d||p,g=this._getState(this.config.eco_entity),u=this._getState(this.config.clean_entity),f=this._getState(this.config.powerful_entity),m=this._getState(this.config.nanoe_entity),y=this._getState(this.config.display_entity),b=this._getState(this.config.buzzer_entity),x=this._getState(this.config.v_swing_entity),w=this._getState(this.config.h_swing_entity),v=this._getState(this.config.converti_entity);a.charAt(0).toUpperCase(),a.slice(1);const _=[{key:"heat",icon:"mdi:fire",label:"Heat"},{key:"fan_only",icon:"mdi:fan",label:"Fan"},{key:"dry",icon:"mdi:water-percent",label:"Dry"}],k=_.some(e=>e.key===i),$=this.config.name||e.attributes.friendly_name||"";return t`
       <ha-card style="--mode-color: ${r}">
 
         ${$?t`
@@ -154,29 +154,29 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
 
           <!-- Left: temperature +/- -->
           <div class="side-controls">
-            ${l?t`<div class="side-placeholder"></div>`:t`
-              <button class="side-btn" @click=${()=>this._setTemp((a||24)+.5)}>
+            ${c?t`<div class="side-placeholder"></div>`:t`
+              <button class="side-btn" @click=${()=>this._setTemp((n||24)+.5)}>
                 <ha-icon icon="mdi:plus" style="--mdc-icon-size: 20px"></ha-icon>
               </button>
               <ha-icon icon="mdi:thermometer"
                 style="--mdc-icon-size: 32px; color: #ff5722; filter: drop-shadow(0 0 8px #ff5722aa)"></ha-icon>
-              <button class="side-btn" @click=${()=>this._setTemp((a||24)-.5)}>
+              <button class="side-btn" @click=${()=>this._setTemp((n||24)-.5)}>
                 <ha-icon icon="mdi:minus" style="--mdc-icon-size: 20px"></ha-icon>
               </button>
             `}
           </div>
 
-          ${this._renderDial(o,this._dragTargetTemp??a,r,l,i,n,s)}
+          ${this._renderDial(o,this._dragTargetTemp??n,r,c,i,a,s)}
 
           <!-- Right: fan speed up/down -->
           <div class="side-controls">
-            ${l?t`<div class="side-placeholder"></div>`:t`
-              <button class="side-btn" @click=${()=>this._cycleFan(1,n)}>
+            ${c?t`<div class="side-placeholder"></div>`:t`
+              <button class="side-btn" @click=${()=>this._cycleFan(1,a)}>
                 <ha-icon icon="mdi:chevron-up" style="--mdc-icon-size: 20px"></ha-icon>
               </button>
-              <ha-icon icon="${this._getFanIcon(n)}"
+              <ha-icon icon="${this._getFanIcon(a)}"
                 style="--mdc-icon-size: 24px; color: var(--mode-color)"></ha-icon>
-              <button class="side-btn" @click=${()=>this._cycleFan(-1,n)}>
+              <button class="side-btn" @click=${()=>this._cycleFan(-1,a)}>
                 <ha-icon icon="mdi:chevron-down" style="--mdc-icon-size: 20px"></ha-icon>
               </button>
             `}
@@ -185,29 +185,29 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
         </div>
 
         <!-- Pill row: Energy | V-Swing | H-Swing | Converti | Features -->
-        ${(()=>{const e=[],i=e=>t=>{t.stopPropagation();const i=this[e];this._closeAllPopups(),this[e]=!i};if(this.config.show_energy&&h){const o=c||p||d;e.push(t`
+        ${(()=>{const e=[],i=e=>t=>{t.stopPropagation();const i=this[e];this._closeAllPopups(),this[e]=!i};if(this.config.show_energy&&h){const o=l||p||d;e.push(t`
               <button class="pill ${this._expandEnergy?"active":""}" @click=${i("_expandEnergy")}
                 title="Energy usage">
                 <ha-icon icon="mdi:calendar-today" style="color: #FFC107"></ha-icon>
                 <span class="pill-val">${o.state} kWh</span>
               </button>
-            `)}if(!l&&this.config.show_swing&&x&&e.push(t`
+            `)}if(!c&&this.config.show_swing&&x&&e.push(t`
               <button class="pill pill-swing ${this._expandVSwing?"active":""}" @click=${i("_expandVSwing")} title="Vertical Swing">
                 <ha-icon icon="mdi:arrow-up-down"></ha-icon>
                 <span class="pill-swing-mini">${this._renderVentIcon(x.state,!1)}</span>
               </button>
-            `),!l&&this.config.show_swing&&w&&e.push(t`
+            `),!c&&this.config.show_swing&&w&&e.push(t`
               <button class="pill pill-swing ${this._expandHSwing?"active":""}" @click=${i("_expandHSwing")} title="Horizontal Swing">
                 <ha-icon icon="mdi:arrow-left-right"></ha-icon>
                 <span class="pill-swing-mini">${this._renderVentIcon(w.state,!0)}</span>
               </button>
-            `),!l&&this.config.show_swing&&v){const o={0:"Off",100:"FC",110:"HC"}[v.state]||`${v.state}%`,a="0"!==v.state&&"unavailable"!==v.state&&"unknown"!==v.state;e.push(t`
-              <button class="pill ${this._expandConverti?"active":""} ${a?"pill-engaged":""}"
+            `),!c&&this.config.show_swing&&v){const o={0:"Off",100:"FC",110:"HC"}[v.state]||`${v.state}%`,n="0"!==v.state&&"unavailable"!==v.state&&"unknown"!==v.state;e.push(t`
+              <button class="pill ${this._expandConverti?"active":""} ${n?"pill-engaged":""}"
                 @click=${i("_expandConverti")} title="Converti8">
                 <ha-icon icon="mdi:percent"></ha-icon>
                 <span class="pill-val">${o}</span>
               </button>
-            `)}return!l&&this.config.show_extras&&e.push(t`
+            `)}return!c&&this.config.show_extras&&e.push(t`
               <button class="pill pill-icon ${this._expandFeatures?"active":""}"
                 @click=${i("_expandFeatures")} title="Features">
                 <ha-icon icon="mdi:tune-variant"></ha-icon>
@@ -259,7 +259,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
             <div class="energy-grid">
               <div class="energy-cell">
                 <ha-icon icon="mdi:calendar-today"></ha-icon>
-                <div class="energy-val">${c?c.state:"—"}<span class="energy-unit"> kWh</span></div>
+                <div class="energy-val">${l?l.state:"—"}<span class="energy-unit"> kWh</span></div>
                 <div class="energy-lbl">Today</div>
               </div>
               <div class="energy-cell">
@@ -277,7 +277,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
         `:""}
 
         <!-- Vertical Swing popup -->
-        ${!l&&this._expandVSwing&&x?t`
+        ${!c&&this._expandVSwing&&x?t`
           <div class="popup-backdrop" @click=${()=>{this._expandVSwing=!1}}></div>
           <div class="detail-popup" @click=${e=>e.stopPropagation()}>
             <div class="popup-title">Vertical Swing</div>
@@ -297,7 +297,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
         `:""}
 
         <!-- Horizontal Swing popup -->
-        ${!l&&this._expandHSwing&&w?t`
+        ${!c&&this._expandHSwing&&w?t`
           <div class="popup-backdrop" @click=${()=>{this._expandHSwing=!1}}></div>
           <div class="detail-popup" @click=${e=>e.stopPropagation()}>
             <div class="popup-title">Horizontal Swing</div>
@@ -317,7 +317,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
         `:""}
 
         <!-- Converti popup -->
-        ${!l&&this._expandConverti&&v?t`
+        ${!c&&this._expandConverti&&v?t`
           <div class="popup-backdrop" @click=${()=>{this._expandConverti=!1}}></div>
           <div class="detail-popup" @click=${e=>e.stopPropagation()}>
             <div class="popup-title">Converti8 · Cooling Performance</div>
@@ -335,7 +335,7 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
         `:""}
 
         <!-- Features popup -->
-        ${!l&&this._expandFeatures&&this.config.show_extras?t`
+        ${!c&&this._expandFeatures&&this.config.show_extras?t`
           <div class="popup-backdrop" @click=${()=>{this._expandFeatures=!1}}></div>
           <div class="detail-popup" @click=${e=>e.stopPropagation()}>
             <div class="popup-title">Features</div>
@@ -344,8 +344,8 @@ console.info("%c KPR-MIRAIE-CARD %c v1.3.3 ","background:#00bfff;color:#000;font
               ${u?t`<button class="toggle-btn ${"on"===u.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.clean_entity)}><ha-icon icon="mdi:broom"></ha-icon><span>Clean</span></button>`:""}
               ${f?t`<button class="toggle-btn ${"on"===f.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.powerful_entity)}><ha-icon icon="mdi:rocket-launch"></ha-icon><span>Boost</span></button>`:""}
               ${m?t`<button class="toggle-btn ${"on"===m.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.nanoe_entity)}><ha-icon icon="mdi:air-purifier"></ha-icon><span>Nanoe</span></button>`:""}
-              ${b?t`<button class="toggle-btn ${"on"===b.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.display_entity)}><ha-icon icon="mdi:monitor"></ha-icon><span>Display</span></button>`:""}
-              ${y?t`<button class="toggle-btn ${"on"===y.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.buzzer_entity)}><ha-icon icon="mdi:volume-high"></ha-icon><span>Buzzer</span></button>`:""}
+              ${y?t`<button class="toggle-btn ${"on"===y.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.display_entity)}><ha-icon icon="mdi:monitor"></ha-icon><span>Display</span></button>`:""}
+              ${b?t`<button class="toggle-btn ${"on"===b.state?"active":""}" @click=${()=>this._toggleSwitch(this.config.buzzer_entity)}><ha-icon icon="mdi:volume-high"></ha-icon><span>Buzzer</span></button>`:""}
             </div>
           </div>
         `:""}
